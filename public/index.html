@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" class=""> <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NexusDrop - Premier Secure File Transfer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
+  <script>
+    // Tailwind Dark Mode Configuration (optional, can be done via html class directly too)
+    // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+      transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+    .brand-font {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .gradient-hero {
+      background: linear-gradient(135deg, #5E72E4 0%, #825EE4 100%); /* Adjusted professional blue/purple */
+    }
+    .dark .gradient-hero {
+      background: linear-gradient(135deg, #3B4A8A 0%, #5A3B8A 100%);
+    }
+    .upload-area {
+      transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out, transform 0.2s ease;
+    }
+    .upload-area.dragover {
+      background-color: theme('colors.indigo.50');
+      border-color: theme('colors.indigo.500');
+      transform: scale(1.02);
+    }
+    .dark .upload-area.dragover {
+      background-color: theme('colors.indigo.900');
+      border-color: theme('colors.indigo.400');
+    }
+    .file-item {
+      animation: slideInUp 0.4s ease-out;
+      transition: background-color 0.2s ease;
+    }
+    .file-item:hover {
+        background-color: theme('colors.gray.50');
+    }
+    .dark .file-item:hover {
+        background-color: theme('colors.gray.700');
+    }
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .progress-bar-fill {
+        transition: width 0.4s ease;
+    }
+    /* Custom scrollbar (optional, for aesthetics) */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: theme('colors.gray.100'); }
+    .dark ::-webkit-scrollbar-track { background: theme('colors.gray.800'); }
+    ::-webkit-scrollbar-thumb { background: theme('colors.indigo.400'); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: theme('colors.indigo.500'); }
+  </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 antialiased">
+
+  <header class="bg-white dark:bg-gray-800 shadow-lg fixed w-full z-50 top-0 transition-colors duration-300">
+    <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+      <a href="#" class="text-3xl font-bold brand-font text-indigo-600 dark:text-indigo-400 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8 mr-2">
+          <path fill-rule="evenodd" d="M9.315 7.584C12.195 3.883 16.695 1.5 21.75 1.5a.75.75 0 0 1 .75.75c0 5.056-2.383 9.555-6.084 12.436A6.75 6.75 0 0 1 9.75 22.5a.75.75 0 0 1-.75-.75v-4.131A15.838 15.838 0 0 1 6.382 15H2.25a.75.75 0 0 1-.75-.75 6.75 6.75 0 0 1 7.815-6.666ZM15 6.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" clip-rule="evenodd" />
+          <path d="M5.26 17.242a.75.75 0 1 0-.897-1.203 5.243 5.243 0 0 0-2.05 5.022.75.75 0 0 0 .897 1.203A6.743 6.743 0 0 1 5.26 17.242Z" />
+        </svg>
+        NexusDrop
+      </a>
+      <div class="hidden md:flex items-center space-x-6">
+        <a href="#uploader" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition font-medium">Upload</a>
+        <a href="#features" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition font-medium">Features</a>
+        <a href="#pricing" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition font-medium">Pricing</a>
+        <a href="#support" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition font-medium">Support</a>
+      </div>
+      <div class="flex items-center">
+        <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 mr-4">
+          <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+          <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm-.707 12.02l.707-.707a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414zM17 13a1 1 0 100 2h-1a1 1 0 100-2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+        </button>
+        <a href="#login" class="bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-300 dark:focus:ring-indigo-800 transition text-sm font-semibold">Login</a>
+        <button class="md:hidden ml-4 text-gray-600 dark:text-gray-300" id="mobileMenuButton" aria-label="Open menu">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+      </div>
+    </nav>
+    <div id="mobileMenu" class="md:hidden hidden bg-white dark:bg-gray-800 shadow-lg py-2">
+        <a href="#uploader" class="block px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Upload</a>
+        <a href="#features" class="block px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Features</a>
+        <a href="#pricing" class="block px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Pricing</a>
+        <a href="#support" class="block px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Support</a>
+    </div>
+  </header>
+
+  <main class="pt-16 sm:pt-20"> <section class="gradient-hero text-white py-20 sm:py-32 px-6 text-center relative overflow-hidden">
+      <div class="absolute inset-0 opacity-10">
+        </div>
+      <div class="container mx-auto relative z-10">
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 leading-tight brand-font">The Premier Platform for <span class="block sm:inline-block">Secure File Transfer</span></h1>
+        <p class="text-lg sm:text-xl mb-10 text-indigo-100 max-w-3xl mx-auto">
+          Experience seamless, encrypted file uploads with blazing speed and robust management tools. Trusted by professionals worldwide.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <a href="#uploader" class="bg-white text-indigo-700 font-semibold py-3 px-10 rounded-lg shadow-xl hover:bg-gray-200 transition text-lg transform hover:scale-105 duration-300 ease-in-out">
+              <i class="fas fa-upload mr-2"></i>Upload File
+            </a>
+            <a href="#features" class="border-2 border-white text-white font-semibold py-3 px-10 rounded-lg shadow-xl hover:bg-white hover:text-indigo-700 transition text-lg transform hover:scale-105 duration-300 ease-in-out">
+              Learn More <i class="fas fa-info-circle ml-2"></i>
+            </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="uploader" class="py-16 sm:py-24 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      <div class="container mx-auto px-6">
+        <div class="bg-white dark:bg-gray-800 p-8 sm:p-12 rounded-2xl shadow-2xl w-full max-w-3xl mx-auto transition-colors duration-300">
+          <div class="text-center mb-10">
+            <i class="fas fa-cloud-arrow-up text-7xl text-indigo-500 dark:text-indigo-400 mb-4"></i>
+            <h2 class="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-white brand-font">Drop Your Files Here</h2>
+            <p class="text-gray-500 dark:text-gray-400 mt-3 text-md">Select one or more files to upload. Drag & drop supported.</p>
+          </div>
+
+          <form id="uploadForm" class="space-y-8">
+            <div id="dropZone" class="upload-area border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-xl p-6 sm:p-10 text-center cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-400">
+              <input id="fileInput" type="file" multiple class="hidden" aria-label="File Uploader"/>
+              <div id="uploadPlaceholder" class="flex flex-col items-center justify-center py-8">
+                <i class="fas fa-file-import text-6xl text-gray-400 dark:text-gray-500 mb-5"></i>
+                <p class="text-xl font-semibold text-gray-700 dark:text-gray-300">Drag files here or <span class="text-indigo-600 dark:text-indigo-400">browse</span></p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Supports multiple files. Max 100MB per file.</p>
+              </div>
+              <div id="fileListPreview" class="hidden space-y-3 text-left mt-4">
+                </div>
+            </div>
+            
+            <div class="flex flex-col items-center">
+                <div class="flex items-center mb-4">
+                    <input id="termsCheckbox" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-2" aria-labelledby="termsLabel">
+                    <label id="termsLabel" for="termsCheckbox" class="text-sm text-gray-600 dark:text-gray-400">I agree to the <a href="#terms" class="text-indigo-600 dark:text-indigo-400 hover:underline">Terms of Service</a></label>
+                </div>
+
+                <button type="submit" id="submitButton" disabled class="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold py-4 px-10 rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 dark:focus:ring-purple-800 transition duration-150 ease-in-out flex items-center justify-center text-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                  <span id="buttonText">Upload Selected Files</span>
+                  <svg id="buttonSpinner" class="animate-spin ml-3 h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </button>
+            </div>
+          </form>
+          
+          <div id="overallProgressContainer" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mt-8 hidden overflow-hidden shadow-inner">
+            <div id="overallProgressBar" class="progress-bar-fill bg-green-500 h-4 rounded-full text-xs font-medium text-white text-center p-0.5 leading-none" style="width: 0%;">0%</div>
+          </div>
+          <div id="result" class="mt-6 text-center text-md min-h-[60px]">
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="py-16 sm:py-24 bg-white dark:bg-gray-800 transition-colors duration-300">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-4 brand-font">Packed with Powerful Features</h2>
+            <p class="text-gray-600 dark:text-gray-400 mb-16 max-w-2xl mx-auto text-lg">NexusDrop is engineered to provide a seamless and secure experience for all your file transfer needs.</p>
+            <div class="grid md:grid-cols-3 gap-8 lg:gap-12">
+                <div class="p-8 bg-gray-50 dark:bg-gray-700 rounded-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
+                    <div class="text-indigo-500 dark:text-indigo-400 text-5xl mb-5"><i class="fas fa-shield-halved"></i></div>
+                    <h3 class="text-2xl font-semibold mb-3 text-gray-700 dark:text-white">Bank-Grade Security</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">AES-256 bit encryption for files at rest and in transit. Your data's safety is our top priority.</p>
+                </div>
+                <div class="p-8 bg-gray-50 dark:bg-gray-700 rounded-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
+                    <div class="text-indigo-500 dark:text-indigo-400 text-5xl mb-5"><i class="fas fa-tachometer-alt-fast"></i></div>
+                    <h3 class="text-2xl font-semibold mb-3 text-gray-700 dark:text-white">Blazing Speeds</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">Optimized for performance, enjoy rapid uploads and downloads regardless of file size.</p>
+                </div>
+                <div class="p-8 bg-gray-50 dark:bg-gray-700 rounded-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
+                    <div class="text-indigo-500 dark:text-indigo-400 text-5xl mb-5"><i class="fas fa-users-gear"></i></div>
+                    <h3 class="text-2xl font-semibold mb-3 text-gray-700 dark:text-white">Intuitive Collaboration</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">Easily share files with granular control over permissions and access links.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="pricing" class="py-16 sm:py-24 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <div class="container mx-auto px-6 text-center">
+             <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-4 brand-font">Simple, Transparent Pricing</h2>
+             <p class="text-gray-600 dark:text-gray-400 mb-16 max-w-2xl mx-auto text-lg">Choose a plan that fits your needs. No hidden fees, ever.</p>
+             <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-2xl font-semibold text-indigo-600 dark:text-indigo-400 mb-2">Basic</h3>
+                    <p class="text-4xl font-bold text-gray-800 dark:text-white mb-1">$10<span class="text-lg font-normal text-gray-500 dark:text-gray-400">/mo</span></p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Perfect for individuals.</p>
+                    <ul class="text-left space-y-2 text-gray-600 dark:text-gray-300 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> 10 GB Storage</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Basic Sharing</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Email Support</li>
+                    </ul>
+                    <button class="w-full bg-gray-200 dark:bg-gray-700 text-indigo-700 dark:text-indigo-300 font-semibold py-3 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">Choose Plan</button>
+                </div>
+                <div class="bg-indigo-600 dark:bg-indigo-700 text-white p-8 rounded-xl shadow-2xl transform scale-105 relative">
+                     <span class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow-400 text-yellow-900 text-xs font-semibold px-3 py-1 rounded-full uppercase">Popular</span>
+                    <h3 class="text-2xl font-semibold mb-2">Pro</h3>
+                    <p class="text-4xl font-bold mb-1">$25<span class="text-lg font-normal opacity-80">/mo</span></p>
+                    <p class="text-sm opacity-80 mb-6">Ideal for professionals & teams.</p>
+                    <ul class="text-left space-y-2 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-300 mr-2"></i> 50 GB Storage</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-300 mr-2"></i> Advanced Sharing</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-300 mr-2"></i> Priority Support</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-300 mr-2"></i> Version History</li>
+                    </ul>
+                    <button class="w-full bg-white text-indigo-700 font-semibold py-3 px-6 rounded-lg hover:bg-gray-100 transition">Choose Plan</button>
+                </div>
+                <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-2xl font-semibold text-indigo-600 dark:text-indigo-400 mb-2">Enterprise</h3>
+                    <p class="text-4xl font-bold text-gray-800 dark:text-white mb-1">Custom</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Tailored for large organizations.</p>
+                    <ul class="text-left space-y-2 text-gray-600 dark:text-gray-300 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Unlimited Storage</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Dedicated Support</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-green-500 mr-2"></i> Custom Integrations</li>
+                    </ul>
+                    <button class="w-full bg-gray-200 dark:bg-gray-700 text-indigo-700 dark:text-indigo-300 font-semibold py-3 px-6 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">Contact Us</button>
+                </div>
+             </div>
+        </div>
+    </section>
+  </main>
+
+  <footer class="bg-gray-900 dark:bg-black text-gray-400 py-12 sm:py-16">
+    <div class="container mx-auto px-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+                <h4 class="text-xl font-bold brand-font text-white mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 mr-2 text-indigo-400">
+                      <path fill-rule="evenodd" d="M9.315 7.584C12.195 3.883 16.695 1.5 21.75 1.5a.75.75 0 0 1 .75.75c0 5.056-2.383 9.555-6.084 12.436A6.75 6.75 0 0 1 9.75 22.5a.75.75 0 0 1-.75-.75v-4.131A15.838 15.838 0 0 1 6.382 15H2.25a.75.75 0 0 1-.75-.75 6.75 6.75 0 0 1 7.815-6.666ZM15 6.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" clip-rule="evenodd" />
+                      <path d="M5.26 17.242a.75.75 0 1 0-.897-1.203 5.243 5.243 0 0 0-2.05 5.022.75.75 0 0 0 .897 1.203A6.743 6.743 0 0 1 5.26 17.242Z" />
+                    </svg>
+                    NexusDrop
+                </h4>
+                <p class="text-sm">Securely transfer and manage your digital assets with confidence.</p>
+            </div>
+            <div>
+                <h5 class="text-lg font-semibold text-white mb-3">Quick Links</h5>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#uploader" class="hover:text-indigo-400 transition">Upload File</a></li>
+                    <li><a href="#features" class="hover:text-indigo-400 transition">Features</a></li>
+                    <li><a href="#pricing" class="hover:text-indigo-400 transition">Pricing</a></li>
+                    <li><a href="#support" class="hover:text-indigo-400 transition">Support Center</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-lg font-semibold text-white mb-3">Legal</h5>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#terms" class="hover:text-indigo-400 transition">Terms of Service</a></li>
+                    <li><a href="#privacy" class="hover:text-indigo-400 transition">Privacy Policy</a></li>
+                    <li><a href="#acceptable-use" class="hover:text-indigo-400 transition">Acceptable Use</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-lg font-semibold text-white mb-3">Connect</h5>
+                <div class="flex space-x-4">
+                    <a href="#" aria-label="Facebook" class="hover:text-indigo-400 transition"><i class="fab fa-facebook-f text-xl"></i></a>
+                    <a href="#" aria-label="Twitter" class="hover:text-indigo-400 transition"><i class="fab fa-twitter text-xl"></i></a>
+                    <a href="#" aria-label="LinkedIn" class="hover:text-indigo-400 transition"><i class="fab fa-linkedin-in text-xl"></i></a>
+                    <a href="#" aria-label="GitHub" class="hover:text-indigo-400 transition"><i class="fab fa-github text-xl"></i></a>
+                </div>
+            </div>
+        </div>
+      <p class="text-sm text-center border-t border-gray-700 pt-8">&copy; <span id="currentYearFooterPage"></span> NexusDrop Technologies Inc. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // --- THEME TOGGLE ---
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+    // Set initial icon based on theme
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      themeToggleLightIcon.classList.remove('hidden');
+    } else {
+      themeToggleDarkIcon.classList.remove('hidden');
+    }
+
+    themeToggleBtn.addEventListener('click', function() {
+      themeToggleDarkIcon.classList.toggle('hidden');
+      themeToggleLightIcon.classList.toggle('hidden');
+
+      if (localStorage.getItem('theme')) {
+        if (localStorage.getItem('theme') === 'light') {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        }
+      } else {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      }
+    });
+
+    // --- MOBILE MENU ---
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+    // Close mobile menu when a link is clicked (for single page navigation)
+    document.querySelectorAll('#mobileMenu a').forEach(link => {
+        link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+    });
+
+
+    // --- UPLOADER LOGIC ---
+    const uploadForm = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('fileInput');
+    const dropZone = document.getElementById('dropZone');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const fileListPreview = document.getElementById('fileListPreview'); // For multiple files
+    
+    const resultDiv = document.getElementById('result');
+    const submitButton = document.getElementById('submitButton');
+    const buttonText = document.getElementById('buttonText');
+    const buttonSpinner = document.getElementById('buttonSpinner');
+    const termsCheckbox = document.getElementById('termsCheckbox');
+    
+    const overallProgressContainer = document.getElementById('overallProgressContainer');
+    const overallProgressBar = document.getElementById('overallProgressBar');
+    
+    document.getElementById('currentYearFooterPage').textContent = new Date().getFullYear();
+
+    let selectedFiles = []; // Store multiple files
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function getFileIconClass(fileType) {
+        if (!fileType) return 'fa-file';
+        if (fileType.startsWith('image/')) return 'fa-file-image';
+        if (fileType === 'application/pdf') return 'fa-file-pdf';
+        if (fileType === 'application/zip' || fileType.includes('archive')) return 'fa-file-archive';
+        if (fileType.startsWith('video/')) return 'fa-file-video';
+        if (fileType.startsWith('audio/')) return 'fa-file-audio';
+        if (fileType.startsWith('text/')) return 'fa-file-lines';
+        if (fileType.includes('spreadsheet') || fileType.includes('excel')) return 'fa-file-excel';
+        if (fileType.includes('presentation') || fileType.includes('powerpoint')) return 'fa-file-powerpoint';
+        if (fileType.includes('document') || fileType.includes('word')) return 'fa-file-word';
+        return 'fa-file-alt';
+    }
+    
+    function displaySelectedFiles() {
+        if (selectedFiles.length === 0) {
+            uploadPlaceholder.classList.remove('hidden');
+            fileListPreview.classList.add('hidden');
+            fileListPreview.innerHTML = ''; // Clear previous list
+        } else {
+            uploadPlaceholder.classList.add('hidden');
+            fileListPreview.classList.remove('hidden');
+            fileListPreview.innerHTML = ''; // Clear and rebuild
+            selectedFiles.forEach((file, index) => {
+                const fileElement = document.createElement('div');
+                fileElement.className = 'file-item flex items-center justify-between p-3 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-sm';
+                fileElement.innerHTML = `
+                    <div class="flex items-center overflow-hidden">
+                        <i class="fas ${getFileIconClass(file.type)} text-2xl text-indigo-500 dark:text-indigo-400 mr-3"></i>
+                        <div class="truncate">
+                            <p class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate" title="${file.name}">${file.name}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">${formatFileSize(file.size)}</p>
+                        </div>
+                    </div>
+                    <button type="button" data-index="${index}" aria-label="Remove file ${file.name}" class="remove-file-btn text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition ml-2">
+                      <i class="fas fa-times-circle text-lg"></i>
+                    </button>
+                `;
+                fileListPreview.appendChild(fileElement);
+            });
+            
+            document.querySelectorAll('.remove-file-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const indexToRemove = parseInt(e.currentTarget.dataset.index);
+                    selectedFiles.splice(indexToRemove, 1);
+                    fileInput.value = ''; // Clear the actual file input; a bit tricky with FileList
+                    displaySelectedFiles(); // Re-render the list
+                    updateSubmitButtonState();
+                });
+            });
+        }
+        updateSubmitButtonState();
+    }
+
+    function updateSubmitButtonState() {
+        if (selectedFiles.length > 0 && termsCheckbox.checked) {
+            submitButton.disabled = false;
+        } else {
+            submitButton.disabled = true;
+        }
+    }
+
+    termsCheckbox.addEventListener('change', updateSubmitButtonState);
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      selectedFiles = Array.from(e.target.files); // Convert FileList to Array
+      displaySelectedFiles();
+    });
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+      document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      selectedFiles = Array.from(dt.files);
+      fileInput.files = dt.files; // Try to set it for consistency, though direct assignment is complex
+      displaySelectedFiles();
+    }, false);
+
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (selectedFiles.length === 0) {
+        resultDiv.innerHTML = `<div class="p-3 bg-yellow-100 dark:bg-yellow-700 dark:text-yellow-100 text-yellow-700 border border-yellow-300 dark:border-yellow-600 rounded-md shadow"><i class="fas fa-exclamation-triangle mr-2"></i>Please select at least one file.</div>`;
+        return;
+      }
+      if (!termsCheckbox.checked) {
+        resultDiv.innerHTML = `<div class="p-3 bg-yellow-100 dark:bg-yellow-700 dark:text-yellow-100 text-yellow-700 border border-yellow-300 dark:border-yellow-600 rounded-md shadow"><i class="fas fa-exclamation-triangle mr-2"></i>Please agree to the Terms of Service.</div>`;
+        return;
+      }
+
+      submitButton.disabled = true;
+      buttonText.textContent = 'Uploading...';
+      buttonSpinner.classList.remove('hidden');
+      resultDiv.innerHTML = ''; // Clear previous messages
+      
+      overallProgressBar.style.width = '0%';
+      overallProgressBar.textContent = '0%';
+      overallProgressBar.className = 'progress-bar-fill bg-indigo-600 h-4 rounded-full text-xs font-medium text-white text-center p-0.5 leading-none';
+      overallProgressContainer.classList.remove('hidden');
+
+      let successfulUploads = 0;
+      let failedUploads = 0;
+      let uploadResultsHTML = '<ul>';
+
+      // For this example, let's process one file at a time to match potential backend
+      // A real multi-file uploader might use Promise.all or a queue
+      for (let i = 0; i < selectedFiles.length; i++) {
+          const file = selectedFiles[i];
+          resultDiv.innerHTML = `<div class="p-3 bg-blue-100 dark:bg-blue-700 dark:text-blue-100 text-blue-700 border border-blue-300 dark:border-blue-600 rounded-md shadow"><i class="fas fa-info-circle mr-2"></i>Uploading ${i+1}/${selectedFiles.length}: "${file.name}"...</div>`;
+          
+          const formData = new FormData();
+          formData.append('file', file);
+
+          // Simple progress simulation for each file
+          overallProgressBar.style.width = `${((i + 0.5) / selectedFiles.length) * 100}%`; 
+          overallProgressBar.textContent = `${Math.round(((i + 0.5) / selectedFiles.length) * 100)}%`;
+
+
+          try {
+            const res = await fetch('/upload', { // Assuming your single backend function
+              method: 'POST',
+              body: formData
+            });
+            const data = await res.json();
+
+            if (res.ok && data.url) {
+              successfulUploads++;
+              uploadResultsHTML += `<li class="text-green-600 dark:text-green-400 py-1"><i class="fas fa-check-circle mr-2"></i>"${file.name}" uploaded: <a href="${data.url}" target="_blank" class="underline hover:text-indigo-500 dark:hover:text-indigo-300">View File</a></li>`;
+            } else {
+              failedUploads++;
+              const errorMsg = data.error || `Upload failed for "${file.name}" with status: ${res.status}`;
+              uploadResultsHTML += `<li class="text-red-600 dark:text-red-400 py-1"><i class="fas fa-times-circle mr-2"></i>${errorMsg}</li>`;
+            }
+          } catch (err) {
+            failedUploads++;
+            uploadResultsHTML += `<li class="text-red-600 dark:text-red-400 py-1"><i class="fas fa-exclamation-circle mr-2"></i>Error uploading "${file.name}": ${err.message || 'Network error or server unavailable.'}</li>`;
+          }
+          overallProgressBar.style.width = `${((i + 1) / selectedFiles.length) * 100}%`;
+          overallProgressBar.textContent = `${Math.round(((i + 1) / selectedFiles.length) * 100)}%`;
+      }
+      uploadResultsHTML += '</ul>';
+      
+      if (successfulUploads > 0 && failedUploads === 0) {
+        overallProgressBar.classList.remove('bg-indigo-600');
+        overallProgressBar.classList.add('bg-green-500');
+        resultDiv.innerHTML = `<div class="p-4 bg-green-100 dark:bg-green-700 dark:text-green-100 text-green-700 border border-green-300 dark:border-green-600 rounded-lg shadow-md"><h4 class="font-semibold text-lg mb-2">All files uploaded successfully!</h4>${uploadResultsHTML}</div>`;
+      } else if (successfulUploads > 0 && failedUploads > 0) {
+        overallProgressBar.classList.remove('bg-indigo-600');
+        overallProgressBar.classList.add('bg-yellow-500');
+        resultDiv.innerHTML = `<div class="p-4 bg-yellow-100 dark:bg-yellow-700 dark:text-yellow-100 text-yellow-700 border border-yellow-300 dark:border-yellow-600 rounded-lg shadow-md"><h4 class="font-semibold text-lg mb-2">Upload Complete with Some Errors:</h4>${uploadResultsHTML}</div>`;
+      } else {
+        overallProgressBar.classList.remove('bg-indigo-600');
+        overallProgressBar.classList.add('bg-red-500');
+        resultDiv.innerHTML = `<div class="p-4 bg-red-100 dark:bg-red-700 dark:text-red-100 text-red-700 border border-red-300 dark:border-red-600 rounded-lg shadow-md"><h4 class="font-semibold text-lg mb-2">All uploads failed:</h4>${uploadResultsHTML}</div>`;
+      }
+      
+      selectedFiles = []; // Clear the selected files array
+      fileInput.value = ''; // Clear the actual file input
+      displaySelectedFiles(); // Update UI to show no files selected
+      termsCheckbox.checked = false; // Reset terms checkbox
+
+      submitButton.disabled = true; // Keep disabled until new files and terms checked
+      buttonText.textContent = 'Upload Selected Files';
+      buttonSpinner.classList.add('hidden');
+      
+      setTimeout(() => { 
+           overallProgressContainer.classList.add('hidden');
+      }, 7000);
+    });
+  </script>
+</body>
+</html>
