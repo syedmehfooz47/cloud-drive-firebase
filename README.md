@@ -6,14 +6,7 @@ NexusDrop is a web application that allows users to securely upload files to Clo
 
 ## Screenshot
 
-**(Recommended: Add a screenshot or GIF of your application here!)**
-*To add a screenshot:*
-1.  *Take a screenshot of your application (e.g., `nexusdrop-ui.png`).*
-2.  *Create an `assets` folder in the root of your GitHub repository.*
-3.  *Upload your screenshot into this `assets` folder.*
-4.  *Replace the line below with:* `![NexusDrop User Interface](assets/nexusdrop-ui.png)`
-
-`[Your Screenshot Will Go Here]`
+![NexusDrop User Interface](assets/nexusdrop-interface.png)
 
 ## Features
 
