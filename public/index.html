@@ -10,8 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
   <script>
-    // Tailwind Dark Mode Configuration (optional, can be done via html class directly too)
-    // On page load or when changing themes, best to add inline in `head` to avoid FOUC
+    // Tailwind Dark Mode Configuration
     if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       document.documentElement.classList.add('dark');
     } else {
@@ -29,7 +28,7 @@
       font-family: 'Space Grotesk', sans-serif;
     }
     .gradient-hero {
-      background: linear-gradient(135deg, #5E72E4 0%, #825EE4 100%); /* Adjusted professional blue/purple */
+      background: linear-gradient(135deg, #5E72E4 0%, #825EE4 100%);
     }
     .dark .gradient-hero {
       background: linear-gradient(135deg, #3B4A8A 0%, #5A3B8A 100%);
@@ -63,7 +62,6 @@
     .progress-bar-fill {
         transition: width 0.4s ease;
     }
-    /* Custom scrollbar (optional, for aesthetics) */
     ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: theme('colors.gray.100'); }
     .dark ::-webkit-scrollbar-track { background: theme('colors.gray.800'); }
@@ -107,7 +105,8 @@
     </div>
   </header>
 
-  <main class="pt-16 sm:pt-20"> <section class="gradient-hero text-white py-20 sm:py-32 px-6 text-center relative overflow-hidden">
+  <main class="pt-16 sm:pt-20">
+    <section class="gradient-hero text-white py-20 sm:py-32 px-6 text-center relative overflow-hidden">
       <div class="absolute inset-0 opacity-10">
         </div>
       <div class="container mx-auto relative z-10">
@@ -146,7 +145,7 @@
               <div id="fileListPreview" class="hidden space-y-3 text-left mt-4">
                 </div>
             </div>
-            
+
             <div class="flex flex-col items-center">
                 <div class="flex items-center mb-4">
                     <input id="termsCheckbox" type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 mr-2" aria-labelledby="termsLabel">
@@ -162,7 +161,7 @@
                 </button>
             </div>
           </form>
-          
+
           <div id="overallProgressContainer" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 mt-8 hidden overflow-hidden shadow-inner">
             <div id="overallProgressBar" class="progress-bar-fill bg-green-500 h-4 rounded-full text-xs font-medium text-white text-center p-0.5 leading-none" style="width: 0%;">0%</div>
           </div>
@@ -195,7 +194,7 @@
             </div>
         </div>
     </section>
-    
+
     <section id="pricing" class="py-16 sm:py-24 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
         <div class="container mx-auto px-6 text-center">
              <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-4 brand-font">Simple, Transparent Pricing</h2>
@@ -339,16 +338,16 @@
     const dropZone = document.getElementById('dropZone');
     const uploadPlaceholder = document.getElementById('uploadPlaceholder');
     const fileListPreview = document.getElementById('fileListPreview'); // For multiple files
-    
+
     const resultDiv = document.getElementById('result');
     const submitButton = document.getElementById('submitButton');
     const buttonText = document.getElementById('buttonText');
     const buttonSpinner = document.getElementById('buttonSpinner');
     const termsCheckbox = document.getElementById('termsCheckbox');
-    
+
     const overallProgressContainer = document.getElementById('overallProgressContainer');
     const overallProgressBar = document.getElementById('overallProgressBar');
-    
+
     document.getElementById('currentYearFooterPage').textContent = new Date().getFullYear();
 
     let selectedFiles = []; // Store multiple files
@@ -374,7 +373,7 @@
         if (fileType.includes('document') || fileType.includes('word')) return 'fa-file-word';
         return 'fa-file-alt';
     }
-    
+
     function displaySelectedFiles() {
         if (selectedFiles.length === 0) {
             uploadPlaceholder.classList.remove('hidden');
@@ -401,13 +400,23 @@
                 `;
                 fileListPreview.appendChild(fileElement);
             });
-            
+
             document.querySelectorAll('.remove-file-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
-                    const indexToRemove = parseInt(e.currentTarget.dataset.index);
+                    // Find the button that was clicked to get its data-index attribute
+                    let targetButton = e.target;
+                    while (targetButton && !targetButton.dataset.index) {
+                        targetButton = targetButton.parentElement;
+                    }
+                    const indexToRemove = parseInt(targetButton.dataset.index);
+
                     selectedFiles.splice(indexToRemove, 1);
-                    fileInput.value = ''; // Clear the actual file input; a bit tricky with FileList
-                    displaySelectedFiles(); // Re-render the list
+                    // Create a new FileList for the input (more robust way)
+                    const dataTransfer = new DataTransfer();
+                    selectedFiles.forEach(file => dataTransfer.items.add(file));
+                    fileInput.files = dataTransfer.files;
+
+                    displaySelectedFiles();
                     updateSubmitButtonState();
                 });
             });
@@ -427,7 +436,7 @@
     dropZone.addEventListener('click', () => fileInput.click());
 
     fileInput.addEventListener('change', (e) => {
-      selectedFiles = Array.from(e.target.files); // Convert FileList to Array
+      selectedFiles = Array.from(e.target.files);
       displaySelectedFiles();
     });
 
@@ -452,7 +461,7 @@
     dropZone.addEventListener('drop', (e) => {
       const dt = e.dataTransfer;
       selectedFiles = Array.from(dt.files);
-      fileInput.files = dt.files; // Try to set it for consistency, though direct assignment is complex
+      fileInput.files = dt.files;
       displaySelectedFiles();
     }, false);
 
@@ -470,8 +479,8 @@
       submitButton.disabled = true;
       buttonText.textContent = 'Uploading...';
       buttonSpinner.classList.remove('hidden');
-      resultDiv.innerHTML = ''; // Clear previous messages
-      
+      resultDiv.innerHTML = '';
+
       overallProgressBar.style.width = '0%';
       overallProgressBar.textContent = '0%';
       overallProgressBar.className = 'progress-bar-fill bg-indigo-600 h-4 rounded-full text-xs font-medium text-white text-center p-0.5 leading-none';
@@ -481,22 +490,18 @@
       let failedUploads = 0;
       let uploadResultsHTML = '<ul>';
 
-      // For this example, let's process one file at a time to match potential backend
-      // A real multi-file uploader might use Promise.all or a queue
       for (let i = 0; i < selectedFiles.length; i++) {
           const file = selectedFiles[i];
           resultDiv.innerHTML = `<div class="p-3 bg-blue-100 dark:bg-blue-700 dark:text-blue-100 text-blue-700 border border-blue-300 dark:border-blue-600 rounded-md shadow"><i class="fas fa-info-circle mr-2"></i>Uploading ${i+1}/${selectedFiles.length}: "${file.name}"...</div>`;
-          
+
           const formData = new FormData();
           formData.append('file', file);
 
-          // Simple progress simulation for each file
-          overallProgressBar.style.width = `${((i + 0.5) / selectedFiles.length) * 100}%`; 
+          overallProgressBar.style.width = `${((i + 0.5) / selectedFiles.length) * 100}%`;
           overallProgressBar.textContent = `${Math.round(((i + 0.5) / selectedFiles.length) * 100)}%`;
 
-
           try {
-            const res = await fetch('/upload', { // Assuming your single backend function
+            const res = await fetch('http://localhost:3001/upload', {
               method: 'POST',
               body: formData
             });
@@ -504,7 +509,10 @@
 
             if (res.ok && data.url) {
               successfulUploads++;
-              uploadResultsHTML += `<li class="text-green-600 dark:text-green-400 py-1"><i class="fas fa-check-circle mr-2"></i>"${file.name}" uploaded: <a href="${data.url}" target="_blank" class="underline hover:text-indigo-500 dark:hover:text-indigo-300">View File</a></li>`;
+              const originalFilename = data.filename || file.name || "downloaded_file";
+              const linkText = `Download ${originalFilename}`;
+              const downloadUrl = `http://localhost:3001/download-file?url=${encodeURIComponent(data.url)}&filename=${encodeURIComponent(originalFilename)}`;
+              uploadResultsHTML += `<li class="text-green-600 dark:text-green-400 py-1"><i class="fas fa-check-circle mr-2"></i>"${originalFilename}" uploaded: <a href="${downloadUrl}" class="underline hover:text-indigo-500 dark:hover:text-indigo-300">${linkText}</a></li>`;
             } else {
               failedUploads++;
               const errorMsg = data.error || `Upload failed for "${file.name}" with status: ${res.status}`;
@@ -518,7 +526,7 @@
           overallProgressBar.textContent = `${Math.round(((i + 1) / selectedFiles.length) * 100)}%`;
       }
       uploadResultsHTML += '</ul>';
-      
+
       if (successfulUploads > 0 && failedUploads === 0) {
         overallProgressBar.classList.remove('bg-indigo-600');
         overallProgressBar.classList.add('bg-green-500');
@@ -532,13 +540,16 @@
         overallProgressBar.classList.add('bg-red-500');
         resultDiv.innerHTML = `<div class="p-4 bg-red-100 dark:bg-red-700 dark:text-red-100 text-red-700 border border-red-300 dark:border-red-600 rounded-lg shadow-md"><h4 class="font-semibold text-lg mb-2">All uploads failed:</h4>${uploadResultsHTML}</div>`;
       }
-      
-      selectedFiles = []; // Clear the selected files array
-      fileInput.value = ''; // Clear the actual file input
-      displaySelectedFiles(); // Update UI to show no files selected
-      termsCheckbox.checked = false; // Reset terms checkbox
 
-      submitButton.disabled = true; // Keep disabled until new files and terms checked
+      selectedFiles = [];
+      // Create a new FileList for the input (more robust way to clear)
+      const dataTransfer = new DataTransfer();
+      fileInput.files = dataTransfer.files;
+
+      displaySelectedFiles();
+      termsCheckbox.checked = false;
+
+      submitButton.disabled = true;
       buttonText.textContent = 'Upload Selected Files';
       buttonSpinner.classList.add('hidden');
       

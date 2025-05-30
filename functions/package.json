@@ -1,13 +1,28 @@
 {
-  "name": "cloudinary-upload-api",
+  "name": "functions",
+  "description": "Cloud Functions for Firebase for Cloud Drive",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
   "engines": {
     "node": "18"
   },
+  "main": "index.js",
   "dependencies": {
     "axios": "^1.6.0",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "form-data": "^4.0.0",
-    "multer": "^1.4.5"
-  }
+    "multer": "^1.4.4-lts.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "eslint-config-google": "^0.14.0"
+  },
+  "private": true
 }
