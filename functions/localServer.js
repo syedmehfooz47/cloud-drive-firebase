@@ -7,7 +7,7 @@ const https = require('https'); // For streaming from Cloudinary URL
 // const { URL } = require('url'); // Not strictly needed if just using filename from request
 
 const app = express(); // <--- THIS LINE WAS MISSING/RE-ADDED
-const PORT = 3001;
+const PORT = process.env.PORT || 3001; // Use Render's port if available, else 3001
 
 app.use(cors({ origin: true }));
 const upload = multer({ storage: multer.memoryStorage() });
