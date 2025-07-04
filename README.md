@@ -1,13 +1,14 @@
 # 🚀 DropHaven - Secure Cloud File Transfer
 
-**Live Demo:** [Click to Launch](https://superlative-entremet-3d67d2.netlify.app/#uploader)
+**Live Demo:** [Click to Launch](https://drophaven.netlify.app/)
 
 DropHaven is a modern web application for secure, seamless file uploads and downloads using cloud storage. It features a polished UI, real-time upload progress, secure backend endpoints, and full responsiveness across devices.
 
 ---
 
+
 ## 🖼️ Screenshot
-> *(Replace this section with a current screenshot of your redesigned DropHaven interface)*
+![drophaven netlify app_(iPad Pro)](https://github.com/user-attachments/assets/f32a10f0-c5bf-441e-9acd-bba08e121a78)
 
 ---
 
