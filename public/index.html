@@ -2,7 +2,7 @@
 <html lang="en" class=""> <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>NexusDrop - Premier Secure File Transfer</title>
+  <title>DropHaven - Premier Secure File Transfer</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -78,7 +78,7 @@
           <path fill-rule="evenodd" d="M9.315 7.584C12.195 3.883 16.695 1.5 21.75 1.5a.75.75 0 0 1 .75.75c0 5.056-2.383 9.555-6.084 12.436A6.75 6.75 0 0 1 9.75 22.5a.75.75 0 0 1-.75-.75v-4.131A15.838 15.838 0 0 1 6.382 15H2.25a.75.75 0 0 1-.75-.75 6.75 6.75 0 0 1 7.815-6.666ZM15 6.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" clip-rule="evenodd" />
           <path d="M5.26 17.242a.75.75 0 1 0-.897-1.203 5.243 5.243 0 0 0-2.05 5.022.75.75 0 0 0 .897 1.203A6.743 6.743 0 0 1 5.26 17.242Z" />
         </svg>
-        NexusDrop
+        DropHaven
       </a>
       <div class="hidden md:flex items-center space-x-6">
         <a href="#uploader" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition font-medium">Upload</a>
@@ -174,7 +174,7 @@
     <section id="features" class="py-16 sm:py-24 bg-white dark:bg-gray-800 transition-colors duration-300">
         <div class="container mx-auto px-6 text-center">
             <h2 class="text-4xl font-bold text-gray-800 dark:text-white mb-4 brand-font">Packed with Powerful Features</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-16 max-w-2xl mx-auto text-lg">NexusDrop is engineered to provide a seamless and secure experience for all your file transfer needs.</p>
+            <p class="text-gray-600 dark:text-gray-400 mb-16 max-w-2xl mx-auto text-lg">DropHaven is engineered to provide a seamless and secure experience for all your file transfer needs.</p>
             <div class="grid md:grid-cols-3 gap-8 lg:gap-12">
                 <div class="p-8 bg-gray-50 dark:bg-gray-700 rounded-xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300">
                     <div class="text-indigo-500 dark:text-indigo-400 text-5xl mb-5"><i class="fas fa-shield-halved"></i></div>
@@ -249,7 +249,7 @@
                       <path fill-rule="evenodd" d="M9.315 7.584C12.195 3.883 16.695 1.5 21.75 1.5a.75.75 0 0 1 .75.75c0 5.056-2.383 9.555-6.084 12.436A6.75 6.75 0 0 1 9.75 22.5a.75.75 0 0 1-.75-.75v-4.131A15.838 15.838 0 0 1 6.382 15H2.25a.75.75 0 0 1-.75-.75 6.75 6.75 0 0 1 7.815-6.666ZM15 6.75a2.25 2.25 0 1 0 0 4.5 2.25 2.25 0 0 0 0-4.5Z" clip-rule="evenodd" />
                       <path d="M5.26 17.242a.75.75 0 1 0-.897-1.203 5.243 5.243 0 0 0-2.05 5.022.75.75 0 0 0 .897 1.203A6.743 6.743 0 0 1 5.26 17.242Z" />
                     </svg>
-                    NexusDrop
+                    DropHaven
                 </h4>
                 <p class="text-sm">Securely transfer and manage your digital assets with confidence.</p>
             </div>
@@ -280,7 +280,7 @@
                 </div>
             </div>
         </div>
-      <p class="text-sm text-center border-t border-gray-700 pt-8">&copy; <span id="currentYearFooterPage"></span> NexusDrop Technologies Inc. All Rights Reserved.</p>
+      <p class="text-sm text-center border-t border-gray-700 pt-8">&copy; <span id="currentYearFooterPage"></span> DropHaven Technologies Inc. All Rights Reserved.</p>
     </div>
   </footer>
 
@@ -500,7 +500,7 @@
 
           try {
             // **** THIS IS THE FETCH URL FOR UPLOAD - NEEDS TO POINT TO LIVE RENDER URL ****
-            const res = await fetch('https://zeeshan-file-api.onrender.com/upload', {
+            const res = await fetch('http://localhost:3001/upload', {
               method: 'POST',
               body: formData
             });
@@ -512,7 +512,7 @@
               const linkText = `Download ${originalFilename}`;
 
               // **** THIS IS THE URL FOR THE DOWNLOAD LINK - NEEDS TO POINT TO LIVE RENDER URL ****
-              const downloadUrl = `https://zeeshan-file-api.onrender.com/download-file?url=${encodeURIComponent(data.url)}&filename=${encodeURIComponent(originalFilename)}`;
+              const downloadUrl = \http://localhost:3001/download-file?url=${encodeURIComponent(data.url)}&filename=${encodeURIComponent(originalFilename)}`;
 
               uploadResultsHTML += `<li class="text-green-600 dark:text-green-400 py-1"><i class="fas fa-check-circle mr-2"></i>"${originalFilename}" uploaded: <a href="${downloadUrl}" class="underline hover:text-indigo-500 dark:hover:text-indigo-300">${linkText}</a></li>`;
             } else {
