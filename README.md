@@ -56,8 +56,8 @@ DropHaven is a modern web application for secure, seamless file uploads and down
 
 ### 🔹 1. Clone the Repository
 ```bash
-git clone https://github.com/zeeshan8088/cloud-drive-firebase.git
-cd cloud-drive-firebase
+git clone https://github.com/syedmehfooz47/drophaven-cloud-drive.git
+cd drophaven-cloud-drive
 ````
 
 ---
@@ -130,11 +130,6 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-**Built with ❤️ by Syed Mehfooz C S**
+**Built by Syed Mehfooz C S**
 
-```
-
----
-
-Let me know if you want a version with badges, screenshots, or contribution guidelines added, Boss.
 ```
